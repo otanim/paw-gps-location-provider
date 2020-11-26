@@ -36,7 +36,7 @@ if (location != null) {
     json.put("Longitude", longitude);
     
     numberOfSatellites = location.getExtras().getInt("satellites");
-    json.put("NumSatellites", numberOfSattelites); //could be 0 if using NETWORK_PROVIDER or phone isnt implementing it.
+    json.put("NumSatellites", numberOfSatellites); //could be 0 if using NETWORK_PROVIDER or phone isnt implementing it.
     
     hasAltitude = location.hasAltitude() ? location.getAltitude() : 0;
     json.put("Altitude", hasAltitude);
