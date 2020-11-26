@@ -7,33 +7,43 @@ import android.location.*;
 import java.text.SimpleDateFormat;
 
 service = server.props.get("serviceContext");
-lm = service.getSystemService(Context.LOCATION_SERVICE);
+locationService = service.getSystemService(Context.LOCATION_SERVICE);
 
-crit = new Criteria();
+criteria = new Criteria();
 crit.setAccuracy(Criteria.ACCURACY_FINE);
 
-provider = lm.getBestProvider(crit, true);
-loc = lm.getLastKnownLocation(provider);
-
-// Initialize GPS location request
-getGpsLocation();
+provider = locationService.getBestProvider(crit, true);
+location = locationService.getLastKnownLocation(provider);
 
 // gps.py output matching variables
-updated = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSZ");
+dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSZ");
 
 // Network provider as fallback
-if (loc == null) {
+if (location == null) {
     provider = LocationManager.NETWORK_PROVIDER;
-    loc = lm.getLastKnownLocation(provider);
+    location = lm.getLastKnownLocation(provider);
 }
 
 json = new JSONObject();
-json.put("Updated", updated.format(loc.getTime()));
-json.put("Latitude", loc.getLatitude());
-json.put("Longitude", loc.getLongitude());
-json.put("NumSatellites", loc.getExtras().getInt("satellites")); //could be 0 if using NETWORK_PROVIDER or phone isnt implementing it.
-json.put("Altitude", loc.hasAltitude()?loc.getAltitude():0);
-
+if (location != null) {
+    updated = dateFormat.format(location.getTime());
+    json.put("Updated", updated);
+    
+    latitude = location.getLatitude();
+    json.put("Latitude", latitude);
+    
+    longitude = location.getLongitude();
+    json.put("Longitude", longitude);
+    
+    numberOfSatellites = location.getExtras().getInt("satellites");
+    json.put("NumSatellites", numberOfSattelites); //could be 0 if using NETWORK_PROVIDER or phone isnt implementing it.
+    
+    hasAltitude = location.hasAltitude() ? location.getAltitude() : 0;
+    json.put("Altitude", hasAltitude);
+} else {
+    json.put("Warning", "The location data has not been cached yet, please wait for a while");
+}
+    
 request.sendResponse(json.toString().getBytes(), "text/plain");
 request.out.flush();
 request.out.close();
