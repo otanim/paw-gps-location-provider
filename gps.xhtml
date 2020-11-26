@@ -21,7 +21,7 @@ dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSZ");
 // Network provider as fallback
 if (location == null) {
     provider = LocationManager.NETWORK_PROVIDER;
-    location = lm.getLastKnownLocation(provider);
+    location = locationService.getLastKnownLocation(provider);
 }
 
 json = new JSONObject();
