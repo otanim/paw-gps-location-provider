@@ -1,0 +1,40 @@
+<bsh>
+//packages
+import de.fun2code.android.pawserver.AndroidInterface;
+import org.json.*;
+import android.content.Context;
+import android.location.*;
+import java.text.SimpleDateFormat;
+
+service = server.props.get("serviceContext");
+lm = service.getSystemService(Context.LOCATION_SERVICE);
+
+crit = new Criteria();
+crit.setAccuracy(Criteria.ACCURACY_FINE);
+
+provider = lm.getBestProvider(crit, true);
+loc = lm.getLastKnownLocation(provider);
+
+// Initialize GPS location request
+getGpsLocation();
+
+// gps.py output matching variables
+updated = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSZ");
+
+// Network provider as fallback
+if (loc == null) {
+    provider = LocationManager.NETWORK_PROVIDER;
+    loc = lm.getLastKnownLocation(provider);
+}
+
+json = new JSONObject();
+json.put("Updated", updated.format(loc.getTime()));
+json.put("Latitude", loc.getLatitude());
+json.put("Longitude", loc.getLongitude());
+json.put("NumSatellites", loc.getExtras().getInt("satellites")); //could be 0 if using NETWORK_PROVIDER or phone isnt implementing it.
+json.put("Altitude", loc.hasAltitude()?loc.getAltitude():0);
+
+request.sendResponse(json.toString().getBytes(), "text/plain");
+request.out.flush();
+request.out.close();
+</bsh>
