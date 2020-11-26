@@ -10,9 +10,9 @@ service = server.props.get("serviceContext");
 locationService = service.getSystemService(Context.LOCATION_SERVICE);
 
 criteria = new Criteria();
-crit.setAccuracy(Criteria.ACCURACY_FINE);
+criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
-provider = locationService.getBestProvider(crit, true);
+provider = locationService.getBestProvider(criteria, true);
 location = locationService.getLastKnownLocation(provider);
 
 // gps.py output matching variables
